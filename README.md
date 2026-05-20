@@ -2,12 +2,11 @@
 Waseet — Dispute & Mediation Management System
 نظام ويب متكامل لإدارة قضايا الوساطة القانونية، مبني كمشروع تخرج في جامعة طيبة.
 
-📌 عن المشروع
+عن المشروع
 وسيط نظام متكامل لإدارة النزاعات مصممة للأقسام القانونية.
 يدعم دورة حياة الشكوى كاملة من التقديم والتعيين إلى جدولة الجلسات والتسوية والقرار النهائي.
 🔗 Demo تجريبي: اضغط هنا لمشاهدة النظام
-
-✨ المميزات
+المميزات
 
 نظام تسجيل دخول مع 5 أدوار مستخدمين مختلفة
 إدارة كاملة لدورة حياة الشكوى
@@ -20,7 +19,7 @@ Waseet — Dispute & Mediation Management System
 واجهة عربية RTL كاملة
 
 
-👥 أدوار المستخدمين
+أدوار المستخدمين
 
 مسؤول النظام — إدارة المستخدمين والحسابات
 موظف — تقديم النزاعات ومتابعتها
@@ -33,19 +32,10 @@ Waseet — Dispute & Mediation Management System
 8 جداول — MySQL:
 employees, cases, casehandlers, caseparties, sessions, session_parties, settlementresponses, finaldecisions
 
-🛠️ التقنيات المستخدمة
-
-PHP 8.2
-MySQL 8.3
-HTML5 / CSS3 / JavaScript
-Bootstrap 5
-XAMPP
 
 
-🚀 تشغيل المشروع محلياً
+تشغيل المشروع محلياً
 
-تثبيت XAMPP
-نسخ المجلد إلى htdocs
 استيراد wasit_system.sql في phpMyAdmin
 فتح http://localhost/waseet-system/
 
@@ -64,3 +54,5 @@ XAMPP
 المطورين: أريام محمد المحمدي - دانية ابراهيم السويح - جود محمد المساوى - جنى سالم العوفي - احلام حسين البلوي
 
 السنة: 2025–2026
+
+<img width="936" height="433" alt="image" src="https://github.com/user-attachments/assets/7950cb83-0beb-4b7c-84a0-d0098addb2aa" />
