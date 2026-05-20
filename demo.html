@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>وسيط — نظام إدارة النزاعات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --green:#173d38;
+  --green-light:#1e5248;
+  --green-pale:#ece8e1;
+  --bg:#f8f6f1;
+  --white:#fff;
+  --text:#173d38;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --red:#dc2626;
+  --yellow:#d97706;
+  --blue:#2563eb;
+}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* ── NAV ── */
+.navbar{width:100%;height:75px;background:var(--white);box-shadow:0 2px 12px rgba(0,0,0,0.06);display:flex;align-items:center;justify-content:space-between;padding:0 40px;position:sticky;top:0;z-index:100;}
+.nav-logo{font-size:24px;font-weight:900;color:var(--green);}
+.nav-logo span{color:#c8a96e;}
+.nav-tabs{display:flex;gap:8px;}
+.nav-tab{padding:8px 18px;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;border:none;background:transparent;color:var(--muted);transition:.2s;}
+.nav-tab.active,.nav-tab:hover{background:var(--green);color:var(--white);}
+.nav-badge{background:var(--green-pale);color:var(--green);padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;}
+
+/* ── SCREENS ── */
+.screen{display:none;animation:fadeIn .3s ease;}
+.screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── LOGIN ── */
+#screen-login{min-height:calc(100vh - 75px);display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8f5f1 0%,#f8f6f1 100%);}
+.login-card{background:var(--white);border-radius:24px;padding:48px 40px;width:100%;max-width:420px;box-shadow:0 20px 50px rgba(0,0,0,0.08);}
+.login-card h2{text-align:center;font-size:26px;font-weight:900;margin-bottom:8px;}
+.login-card p{text-align:center;color:var(--muted);margin-bottom:32px;font-size:14px;}
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;font-weight:700;margin-bottom:6px;font-size:14px;}
+.form-control{width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid var(--border);font-family:'Cairo',sans-serif;font-size:14px;transition:.2s;}
+.form-control:focus{outline:none;border-color:var(--green);}
+.btn-green{width:100%;padding:13px;border:none;border-radius:12px;background:var(--green);color:var(--white);font-family:'Cairo',sans-serif;font-weight:700;font-size:16px;cursor:pointer;transition:.2s;}
+.btn-green:hover{background:var(--green-light);}
+.demo-accounts{margin-top:24px;background:var(--bg);border-radius:12px;padding:16px;}
+.demo-accounts p{font-weight:700;font-size:13px;margin-bottom:10px;}
+.demo-btn{display:block;width:100%;padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);font-family:'Cairo',sans-serif;font-size:13px;cursor:pointer;text-align:right;margin-bottom:6px;transition:.2s;}
+.demo-btn:hover{border-color:var(--green);background:#f0faf7;}
+.demo-btn span{color:var(--muted);font-size:12px;}
+
+/* ── DASHBOARD ── */
+.dash-layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 75px);}
+.sidebar{background:var(--green);padding:24px 16px;display:flex;flex-direction:column;gap:4px;}
+.sidebar-title{color:rgba(255,255,255,0.5);font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:8px 12px;margin-top:16px;}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;color:rgba(255,255,255,0.7);cursor:pointer;font-size:14px;font-weight:600;transition:.2s;}
+.sidebar-link:hover,.sidebar-link.active{background:rgba(255,255,255,0.12);color:var(--white);}
+.sidebar-link i{font-size:18px;}
+.sidebar-user{margin-top:auto;padding:14px;background:rgba(255,255,255,0.1);border-radius:12px;color:var(--white);}
+.sidebar-user .name{font-weight:700;font-size:14px;}
+.sidebar-user .role{font-size:12px;color:rgba(255,255,255,0.6);}
+.main-content{padding:32px;overflow-y:auto;}
+.page-title{font-size:24px;font-weight:900;margin-bottom:24px;}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+.stat-card{background:var(--white);border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+.stat-num{font-size:32px;font-weight:900;}
+.stat-label{color:var(--muted);font-size:13px;margin-top:4px;}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;}
+
+/* ── TABLE ── */
+.table-card{background:var(--white);border-radius:16px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-bottom:24px;}
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.table-header h3{font-size:16px;font-weight:800;}
+.btn-sm{padding:7px 14px;border-radius:8px;border:none;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-primary{background:var(--green);color:var(--white);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+table{width:100%;border-collapse:collapse;}
+th{text-align:right;padding:10px 12px;font-size:13px;color:var(--muted);font-weight:600;border-bottom:2px solid var(--border);}
+td{padding:12px;font-size:13px;border-bottom:1px solid var(--border);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#f9fafb;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+.badge-open{background:#dcfce7;color:#166534;}
+.badge-review{background:#fef9c3;color:#854d0e;}
+.badge-mediation{background:#dbeafe;color:#1e40af;}
+.badge-escalated{background:#fee2e2;color:#991b1b;}
+.badge-closed{background:#f3f4f6;color:#374151;}
+.badge-pending{background:#fef9c3;color:#854d0e;}
+.badge-approved{background:#dcfce7;color:#166534;}
+.priority-high{color:var(--red);font-weight:700;}
+.priority-med{color:var(--yellow);font-weight:700;}
+.priority-low{color:var(--blue);font-weight:700;}
+
+/* ── FORM PAGE ── */
+.form-card{background:var(--white);border-radius:16px;padding:32px;box-shadow:0 2px 8px rgba(0,0,0,0.04);max-width:700px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-group-block{margin-bottom:20px;}
+.form-group-block label{display:block;font-weight:700;font-size:14px;margin-bottom:6px;}
+textarea.form-control{min-height:100px;resize:vertical;}
+select.form-control{cursor:pointer;}
+
+@media(max-width:768px){
+  .dash-layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .form-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar">
+  <div class="nav-logo">وسيط<span>.</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showScreen('login')">تسجيل الدخول</button>
+    <button class="nav-tab" onclick="showScreen('admin')">الإدارة العليا</button>
+    <button class="nav-tab" onclick="showScreen('legal')">المعالج القانوني</button>
+    <button class="nav-tab" onclick="showScreen('employee')">الموظف</button>
+    <button class="nav-tab" onclick="showScreen('cases')">القضايا</button>
+  </div>
+  <div class="nav-badge">Demo تجريبي</div>
+</nav>
+
+<!-- LOGIN -->
+<div id="screen-login" class="screen active">
+  <div style="min-height:calc(100vh - 75px);display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8f5f1,#f8f6f1);">
+    <div class="login-card">
+      <h2>نظام وسيط</h2>
+      <p>إدارة النزاعات والوساطة القانونية</p>
+      <div class="form-group">
+        <label>اسم المستخدم أو البريد الإلكتروني</label>
+        <input class="form-control" type="text" placeholder="admin" value="admin"/>
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور</label>
+        <input class="form-control" type="password" value="password"/>
+      </div>
+      <button class="btn-green" onclick="showScreen('admin')">تسجيل الدخول</button>
+      <div class="demo-accounts">
+        <p>🔐 حسابات تجريبية:</p>
+        <button class="demo-btn" onclick="showScreen('admin')">الإدارة العليا <span>admin / password</span></button>
+        <button class="demo-btn" onclick="showScreen('legal')">المعالج القانوني <span>legal / password</span></button>
+        <button class="demo-btn" onclick="showScreen('employee')">الموظف <span>emp / password</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="screen-admin" class="screen">
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div style="color:#fff;font-size:20px;font-weight:900;padding:8px 12px;margin-bottom:8px;">وسيط<span style="color:#c8a96e;">.</span></div>
+      <div class="sidebar-link active"><i class="bi bi-grid"></i> لوحة التحكم</div>
+      <div class="sidebar-title">الإدارة</div>
+      <div class="sidebar-link" onclick="showScreen('cases')"><i class="bi bi-folder2-open"></i> القضايا</div>
+      <div class="sidebar-link"><i class="bi bi-people"></i> إدارة المستخدمين</div>
+      <div class="sidebar-link"><i class="bi bi-person-check"></i> طلبات التسجيل</div>
+      <div class="sidebar-link"><i class="bi bi-graph-up"></i> التقارير</div>
+      <div class="sidebar-user">
+        <div class="name">مدير النظام</div>
+        <div class="role">الإدارة العليا</div>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="page-title">لوحة الإدارة العليا</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#dcfce7;color:#166534;"><i class="bi bi-folder2-open"></i></div>
+          <div class="stat-num">24</div>
+          <div class="stat-label">إجمالي القضايا</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fef9c3;color:#854d0e;"><i class="bi bi-hourglass-split"></i></div>
+          <div class="stat-num">8</div>
+          <div class="stat-label">قيد المراجعة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fee2e2;color:#991b1b;"><i class="bi bi-arrow-up-circle"></i></div>
+          <div class="stat-num">3</div>
+          <div class="stat-label">قضايا مُصعّدة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#dbeafe;color:#1e40af;"><i class="bi bi-people"></i></div>
+          <div class="stat-num">12</div>
+          <div class="stat-label">المستخدمون</div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <h3>طلبات التسجيل المعلّقة</h3>
+          <button class="btn-sm btn-outline">عرض الكل</button>
+        </div>
+        <table>
+          <thead><tr><th>الاسم</th><th>القسم</th><th>البريد</th><th>الحالة</th><th>إجراء</th></tr></thead>
+          <tbody>
+            <tr><td>سارة العمري</td><td>معالج قانوني</td><td>sara@example.com</td><td><span class="badge badge-pending">معلّق</span></td><td><button class="btn-sm btn-primary">موافقة</button></td></tr>
+            <tr><td>خالد المطيري</td><td>موظف</td><td>khalid@example.com</td><td><span class="badge badge-pending">معلّق</span></td><td><button class="btn-sm btn-primary">موافقة</button></td></tr>
+            <tr><td>نورة الشمري</td><td>معالج قانوني</td><td>noura@example.com</td><td><span class="badge badge-approved">مقبول</span></td><td><button class="btn-sm btn-outline">عرض</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LEGAL DASHBOARD -->
+<div id="screen-legal" class="screen">
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div style="color:#fff;font-size:20px;font-weight:900;padding:8px 12px;margin-bottom:8px;">وسيط<span style="color:#c8a96e;">.</span></div>
+      <div class="sidebar-link active"><i class="bi bi-grid"></i> لوحة التحكم</div>
+      <div class="sidebar-title">القضايا</div>
+      <div class="sidebar-link" onclick="showScreen('cases')"><i class="bi bi-folder2-open"></i> قضاياي</div>
+      <div class="sidebar-link"><i class="bi bi-calendar3"></i> الجلسات</div>
+      <div class="sidebar-link"><i class="bi bi-check2-circle"></i> التسويات</div>
+      <div class="sidebar-link"><i class="bi bi-chat-dots"></i> التوصيات</div>
+      <div class="sidebar-user">
+        <div class="name">أحمد الغامدي</div>
+        <div class="role">معالج قانوني</div>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="page-title">لوحة المعالج القانوني</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#dbeafe;color:#1e40af;"><i class="bi bi-folder2-open"></i></div>
+          <div class="stat-num">7</div>
+          <div class="stat-label">قضاياي</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#dcfce7;color:#166534;"><i class="bi bi-calendar3"></i></div>
+          <div class="stat-num">3</div>
+          <div class="stat-label">جلسات قادمة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fef9c3;color:#854d0e;"><i class="bi bi-clock-history"></i></div>
+          <div class="stat-num">2</div>
+          <div class="stat-label">تسويات معلّقة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#f3e8ff;color:#7e22ce;"><i class="bi bi-check2-all"></i></div>
+          <div class="stat-num">4</div>
+          <div class="stat-label">مُغلقة</div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <h3>الجلسات القادمة</h3>
+          <button class="btn-sm btn-primary" onclick="showScreen('cases')">جدولة جلسة</button>
+        </div>
+        <table>
+          <thead><tr><th>القضية</th><th>التاريخ</th><th>الوقت</th><th>المكان</th><th>الأطراف</th></tr></thead>
+          <tbody>
+            <tr><td>نزاع عقاري #1042</td><td>2026/05/25</td><td>10:00 ص</td><td>قاعة أ</td><td>طرفان</td></tr>
+            <tr><td>نزاع تجاري #1038</td><td>2026/05/27</td><td>02:00 م</td><td>قاعة ب</td><td>3 أطراف</td></tr>
+            <tr><td>نزاع عمالي #1031</td><td>2026/05/29</td><td>11:00 ص</td><td>قاعة أ</td><td>طرفان</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMPLOYEE DASHBOARD -->
+<div id="screen-employee" class="screen">
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div style="color:#fff;font-size:20px;font-weight:900;padding:8px 12px;margin-bottom:8px;">وسيط<span style="color:#c8a96e;">.</span></div>
+      <div class="sidebar-link active"><i class="bi bi-grid"></i> لوحة التحكم</div>
+      <div class="sidebar-title">النزاعات</div>
+      <div class="sidebar-link" onclick="showScreen('cases')"><i class="bi bi-folder2-open"></i> نزاعاتي</div>
+      <div class="sidebar-link"><i class="bi bi-plus-circle"></i> تقديم نزاع جديد</div>
+      <div class="sidebar-user">
+        <div class="name">محمد السبيعي</div>
+        <div class="role">موظف</div>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="page-title">لوحة الموظف</div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#dbeafe;color:#1e40af;"><i class="bi bi-folder2-open"></i></div>
+          <div class="stat-num">3</div>
+          <div class="stat-label">نزاعاتي</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#dcfce7;color:#166534;"><i class="bi bi-check2-circle"></i></div>
+          <div class="stat-num">1</div>
+          <div class="stat-label">مُسوّاة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fef9c3;color:#854d0e;"><i class="bi bi-hourglass-split"></i></div>
+          <div class="stat-num">2</div>
+          <div class="stat-label">قيد المعالجة</div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <h3>نزاعاتي</h3>
+          <button class="btn-sm btn-primary">+ تقديم نزاع جديد</button>
+        </div>
+        <div class="form-card" style="margin-top:16px;">
+          <div style="font-weight:800;margin-bottom:20px;font-size:16px;">تقديم نزاع جديد</div>
+          <div class="form-group-block">
+            <label>عنوان النزاع</label>
+            <input class="form-control" placeholder="اكتب عنوان النزاع..."/>
+          </div>
+          <div class="form-row">
+            <div class="form-group-block">
+              <label>الأولوية</label>
+              <select class="form-control"><option>عالية</option><option>متوسطة</option><option>منخفضة</option></select>
+            </div>
+            <div class="form-group-block">
+              <label>الطرف الآخر</label>
+              <input class="form-control" placeholder="اسم الطرف الآخر"/>
+            </div>
+          </div>
+          <div class="form-group-block">
+            <label>وصف النزاع</label>
+            <textarea class="form-control" placeholder="اشرح تفاصيل النزاع..."></textarea>
+          </div>
+          <button class="btn-green" style="width:auto;padding:11px 28px;">تقديم النزاع</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CASES LIST -->
+<div id="screen-cases" class="screen">
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div style="color:#fff;font-size:20px;font-weight:900;padding:8px 12px;margin-bottom:8px;">وسيط<span style="color:#c8a96e;">.</span></div>
+      <div class="sidebar-link" onclick="showScreen('admin')"><i class="bi bi-grid"></i> لوحة التحكم</div>
+      <div class="sidebar-title">القضايا</div>
+      <div class="sidebar-link active"><i class="bi bi-folder2-open"></i> جميع القضايا</div>
+      <div class="sidebar-link"><i class="bi bi-arrow-up-circle"></i> المُصعّدة</div>
+      <div class="sidebar-link"><i class="bi bi-calendar3"></i> الجلسات</div>
+      <div class="sidebar-link"><i class="bi bi-check2-circle"></i> التسويات</div>
+      <div class="sidebar-link"><i class="bi bi-graph-up"></i> التقارير</div>
+    </div>
+    <div class="main-content">
+      <div class="page-title">إدارة القضايا</div>
+      <div class="table-card">
+        <div class="table-header">
+          <h3>جميع القضايا</h3>
+          <div style="display:flex;gap:8px;">
+            <input class="form-control" placeholder="بحث..." style="width:200px;padding:7px 12px;"/>
+            <button class="btn-sm btn-primary">+ قضية جديدة</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>#</th><th>عنوان القضية</th><th>الأولوية</th><th>الحالة</th><th>المعالج</th><th>التاريخ</th><th>إجراء</th></tr></thead>
+          <tbody>
+            <tr><td>1042</td><td>نزاع عقاري — شركة الأمل</td><td class="priority-high">عالية</td><td><span class="badge badge-mediation">في الوساطة</span></td><td>أحمد الغامدي</td><td>2026/05/10</td><td><button class="btn-sm btn-outline">عرض</button></td></tr>
+            <tr><td>1041</td><td>نزاع تجاري — مؤسسة النور</td><td class="priority-med">متوسطة</td><td><span class="badge badge-review">قيد المراجعة</span></td><td>سارة العمري</td><td>2026/05/08</td><td><button class="btn-sm btn-outline">عرض</button></td></tr>
+            <tr><td>1040</td><td>نزاع عمالي — موظف الشركة</td><td class="priority-high">عالية</td><td><span class="badge badge-escalated">مُصعّدة</span></td><td>أحمد الغامدي</td><td>2026/05/05</td><td><button class="btn-sm btn-outline">عرض</button></td></tr>
+            <tr><td>1039</td><td>نزاع مالي — شريك تجاري</td><td class="priority-low">منخفضة</td><td><span class="badge badge-open">مفتوحة</span></td><td>—</td><td>2026/05/03</td><td><button class="btn-sm btn-primary">تعيين</button></td></tr>
+            <tr><td>1038</td><td>نزاع عقاري — ورثة العائلة</td><td class="priority-med">متوسطة</td><td><span class="badge badge-closed">مغلقة</span></td><td>نورة الشمري</td><td>2026/04/28</td><td><button class="btn-sm btn-outline">عرض</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  const tabs = ['login','admin','legal','employee','cases'];
+  const idx = tabs.indexOf(name);
+  if(idx>=0) document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+}
+</script>
+</body>
+</html>
