@@ -48,7 +48,7 @@ XAMPP
 استيراد wasit_system.sql في phpMyAdmin
 فتح http://localhost/waseet-system/
 
-حساب الدخول الافتراضي:
+حساب الدخول الافتراضي ك مدير النظام لقبول طلبات انشاء الحسابات:
 
 المستخدم: admin
 كلمة المرور: password
