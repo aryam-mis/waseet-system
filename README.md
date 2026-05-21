@@ -55,4 +55,6 @@ employees, cases, casehandlers, caseparties, sessions, session_parties, settleme
 
 السنة: 2025–2026
 
-<img width="936" height="433" alt="image" src="https://github.com/user-attachments/assets/7950cb83-0beb-4b7c-84a0-d0098addb2aa" />
+<a href="https://aryam-mis.github.io/waseet-system/demo.html">
+  <img width="936" height="433" alt="image" src="https://github.com/user-attachments/assets/7950cb83-0beb-4b7c-84a0-d0098addb2aa" />
+</a>
